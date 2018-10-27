@@ -241,6 +241,7 @@ Player_play=Play()
 #pre-game variables
 budget_bet.set_budget() #sets the budget
 while Player_play.another_game:
+    print("Welcome To Blackjack OOP!")
     if budget_bet.budget<1:
         print("Ups, you ran out of funds! please buy new chips!")
         budget_bet.set_budget() #resets the budget if out of funds
