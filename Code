@@ -1,0 +1,266 @@
+
+# coding: utf-8
+
+# In[11]:
+
+
+from IPython.display import clear_output
+
+class budget_managing():
+    
+    """This class manages the initial budget and sets the bet"""
+    
+    def __init__(self):
+        self.budget=0 #stores the amount of chips
+        self.bet=0 #stores the chosen bet value
+    def set_budget(self): #sets the budget
+        self.budget=int(input("How many chips would you like?:"))
+    def set_bet(self): #sets the bet
+        self.bet=int(input("How much do you want to bet?:"))
+    def double_bet(self): #doubles the bet value
+        self.bet*=2
+    def check_input_bet(self):#calls set_bet() and compares it to the budget
+        while True:
+            #clear_output()
+            self.set_bet()
+            if self.bet<=self.budget:
+                break
+            else:
+                print(f"Your bet is too large. Your have {self.budget} chips")
+
+
+# In[7]:
+
+
+###Sets the deck
+class deck():
+    
+    """This sets the deck and returns a shuffled deck of number_of_decks"""
+    
+    def __init__(self):
+        self.ranks=['Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Jack', 'Queen', 'King', 'Ace']
+        self.suits=["Hearts","Diamonds","Spades","Clubs"]
+        self.values=[i for i in range(2,10)]+[10]*4+[11]#values to attach to cards
+        self.number_of_decks=6 #number of decks
+        self.deck_dict={} #empty dictionary to add items to
+        self.deck_packs=[] #final pack
+        
+    def set_deck(self): #creates or resets a shuffled deck with above variables
+        for suit in self.suits: #4 Suits
+            for i in range(13): #13 Ranks loop done 4 times
+                self.deck_dict[f"{self.ranks[i]} of {suit}"]=self.values[i] #creation of dictionary
+        self.deck_packs=[i for i in self.deck_dict.items()]*self.number_of_decks #creates a deck the size of number_of_decks with the cards in the form of tuples
+        shuffle(self.deck_packs) #shuffles the pack - we imported random library
+        #return self.deck_packs
+    
+    def draw_card(self): #pops the card from list and returns it
+        card=self.deck_packs.pop()
+        return card
+
+
+# In[13]:
+
+
+class Player_hand():
+    """Sets the hand of the player"""    
+    def __init__(self):
+        self.hand=[]#HOLDS THE CARDS OF THE PLAYER
+        self.worth=[]#HOLDS THE VALUES OF THE CARDS OF THE PLAYER
+        self.player="PLAYER" #variable for child Class
+        self.dealer=False #variable for child Class
+        self.buy_value=22 #variable to differentiate buying limit for dealer and player
+        self.no_double=True
+        
+    def set_hand(self,cards=2,display=1):#SETS THE INITIAL HAND OF THE PLAYER
+        for i in range(cards):#deals cards in range cards
+            self.hand.append(Deck_Class.draw_card()) #appends card to hand - FROM DECK_CLASS!!!!!
+            self.worth.append(int(self.hand[-1][1])) #appends the value of above card to list of values
+        if display==1:
+            first_card="--misterycard--" if self.dealer else self.hand[0][0]
+            return f"{self.player}: {first_card} & {self.hand[1][0]} Total:{sum(self.worth)}"
+    def nine_ten_eleven(self):
+        if sum(self.worth) in (9,10,11):
+            Double=input("do you want to double your bet?:").lower()
+            if Double[0]=="y" and  budget_bet.bet*2<=budget_bet.budget:
+                budget_bet.double_bet() #calls budget_managing class and doubles the bet instance of budget_bet
+                clear_output() #clears the output
+                self.hand.append(Deck_Class.draw_card()) #appends card to hand - FROM DECK_CLASS!!!!!
+                self.worth.append(int(self.hand[-1][1])) #appends the value of above card to list of values
+                self.no_double=False
+            else:
+                pass
+        else:
+            pass
+    def check_for_aces(self): #Adjusts an Ace 11 to a 1 if necessary
+        for i in range(0,len(self.hand)):
+            if self.hand[i][0][:3]=='Ace': #iterates through items in hand looking for 'Ace'
+                if sum(self.worth)>21: #if it found an ace and the worth of the deck is over 21 it turns ace into 1
+                    self.worth[i]=1
+    def deal_cards(self): #function that deals cards until requirement
+        if self.player=="DEALER" and sum(player_hand.worth)>21: #In dealer class no need to get cards if initial cards of player are a BLACKJACK
+            pass
+        else:
+            while sum(self.worth)<self.buy_value and self.no_double: 
+                if self.draw_card_bool():
+                    clear_output()
+                    self.set_hand(1,0)#calls the set_hand function with changed parameters (one card at a time now)
+                    self.check_for_aces()
+                    if self.player=="PLAYER":
+                        print(f"{dealer_hand.player}: {[i[0] for i in dealer_hand.hand]}"+f" Total: {sum(dealer_hand.worth)}")
+                    print(f"{self.player} pulled card: {self.hand[-1][0]}")
+                    print(f"{self.player}: {[i[0] for i in self.hand]}"+f" Total: {sum(self.worth)}")
+                else:
+                    break
+                
+    def draw_card_bool(self): #asks for HIT or STAND
+        if self.player=="PLAYER":
+            another_card=input("Hit or Stand:").lower()[0]
+            if another_card=="h":
+                return True
+            elif another_card=="s":
+                return False
+        else:
+            return True
+                    
+        
+class Dealer_hand(Player_hand):#Inherits from Player_hand
+    def __init__(self):
+        Player_hand.__init__(self)
+        self.dealer=True
+        self.player="DEALER"
+        self.buy_value=17
+
+
+# In[ ]:
+
+
+class Play():
+    
+    """Player action definitions"""
+    
+    def __init__(self):
+        self.another_game=True
+        
+    def wingame(self):
+        dealer_cards=f"Dealer cards: {[i[0] for i in dealer_hand.hand]} Total Value: {sum(dealer_hand.worth)}"
+        player_cards=f"Player cards: {[i[0] for i in player_hand.hand]} Total Value: {sum(player_hand.worth)}"
+        if sum(player_hand.worth)==sum(dealer_hand.worth)==21 and len(dealer_hand.worth)==2 and len(player_hand.worth)>2:
+            budget_bet.budget-=(budget_bet.bet*1.5)
+            print("\n")
+            print("You lose, Dealer Blackjack!")
+            print(dealer_cards)
+            print(player_cards) 
+            print(f"\nYou lost {budget_bet.bet*1.5}, your budget is {budget_bet.budget}")
+        elif sum(player_hand.worth)==sum(dealer_hand.worth):
+            print("\n")
+            print("PUSH")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYour budget is {budget_bet.budget}")
+        elif sum(dealer_hand.worth)==21 and len(dealer_hand.worth)==2 and (sum(player_hand.worth)<21 or sum(player_hand.worth)>21):
+            budget_bet.budget-=(budget_bet.bet*1.5)
+            print("\n")
+            print("You Lose, Dealer BLACKJACK!")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYou lost {budget_bet.bet*1.5}, your budget is {budget_bet.budget}")
+        elif sum(player_hand.worth)==21 and len(player_hand.worth)==2:
+            budget_bet.budget+=(budget_bet.bet*1.5)
+            print("\n")
+            print("BLACKJACK!")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYou won {budget_bet.bet*1.5}, your budget is {budget_bet.budget}")
+        elif sum(player_hand.worth)>21:
+            budget_bet.budget-=(budget_bet.bet)
+            print("\n")
+            print("You lose, over 21!")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYou lost {budget_bet.bet}, your budget is {budget_bet.budget}")
+        elif sum(dealer_hand.worth)==21 and sum(player_hand.worth)<21:
+            budget_bet.budget-=(budget_bet.bet)
+            print("You Lose, Dealer TWENTY ONE!")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYou lost {budget_bet.bet}, your budget is {budget_bet.budget}")
+        elif sum(player_hand.worth)==21 and sum(dealer_hand.worth)<21:
+            budget_bet.budget+=(budget_bet.bet)
+            print("TWENTY ONE!")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYou won {budget_bet.bet}, your budget is {budget_bet.budget}")
+        elif sum(player_hand.worth)>sum(dealer_hand.worth):
+            budget_bet.budget+=(budget_bet.bet)
+            print("\n")
+            print("You Win, more than dealer!")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYou won {budget_bet.bet}, your budget is {budget_bet.budget}")
+        elif sum(dealer_hand.worth)>21:
+            budget_bet.budget+=budget_bet.bet
+            print("\n")
+            print("You Win, dealer went over 21!")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYou won {budget_bet.bet}, your budget is {budget_bet.budget}")
+        elif sum(player_hand.worth)<sum(dealer_hand.worth) and sum(dealer_hand.worth)<22:
+            budget_bet.budget-=(budget_bet.bet)
+            print("\n")
+            print("You lose, less than dealer!")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYou lost {budget_bet.bet}, your budget is {budget_bet.budget}")
+        else:
+            print("\n")
+            print("you have quit the game")
+            print(dealer_cards)
+            print(player_cards)
+            print(f"\nYou lost {budget_bet.bet+budget_bet.bet}, your budget is {budget_bet.budget}")
+            
+    def anothergame(self):
+        another_game=input("Press enter to continue, type 'Q' to quit: ")
+        if another_game=="":
+            self.another_game = True
+        else:
+            self.another_game = False
+
+
+# GAMEPLAY TEST
+
+# In[18]:
+
+
+from random import shuffle
+from IPython.display import clear_output
+#classes
+budget_bet=budget_managing()#makes an instance of budget_managing()
+Deck_Class=deck() #makes an instance of deck()
+Player_play=Play()
+
+#pre-game variables
+budget_bet.set_budget() #sets the budget
+while Player_play.another_game:
+    if budget_bet.budget<1:
+        print("Ups, you ran out of funds! please buy new chips!")
+        budget_bet.set_budget() #resets the budget if out of funds
+    while True:
+        budget_bet.check_input_bet() #ask for bet amount
+        Deck_Class.set_deck() #shuffles the deck
+        #print(len(Deck_Class.deck_packs))
+        player_hand=Player_hand() #makes an instance of Player_hand()
+        dealer_hand=Dealer_hand() #makes an instance of Dealer_hand()
+        print(dealer_hand.set_hand())#displays the first hand of the dealer
+        print(player_hand.set_hand()) #displays the first hand of the player
+        player_hand.nine_ten_eleven() #checks for (9,10,11) and doubles if "yes"
+        if sum(player_hand.worth)==21: #in case we start of with a Blackjack
+            dealer_hand.deal_cards() #then immediately turn dealer
+            Player_play.wingame() #check who won
+            break
+        else:
+            player_hand.deal_cards() #turn player
+            dealer_hand.deal_cards() #turn dealer
+            Player_play.wingame() #check who won
+            break
+    Player_play.anothergame() #ask if replay
+
